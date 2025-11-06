@@ -1,6 +1,6 @@
 # QueryMe
 
-QueryMe är en personlig AI-driven chattapplikation som gör det möjligt för användare att ställa frågor om mig och få svar som är skräddarsydda utifrån specifika parametrar. Den är byggd för att integreras på min portfoliosida och visa hur AI kan användas för att skapa en interaktiv och personlig upplevelse.
+QueryMe är en personlig AI-driven chattapplikation som gör det möjligt för användare att ställa frågor om mig och få svar som är skräddarsydda utifrån specifika parametrar. Den är byggd för att integreras på min portfoliosida och visar hur AI kan användas för att skapa en interaktiv och personlig upplevelse.
 
 ## Funktioner
 
@@ -11,18 +11,15 @@ QueryMe är en personlig AI-driven chattapplikation som gör det möjligt för a
 
 ## Teknikstack
 
-- **Frontend:** [ex. React, Next.js]
-- **Backend / AI-integration:** [ex. Node.js, Express, OpenAI API]
-- **Databas / Parametrar:** [ex. Supabase, MongoDB]
-
-> Anpassa listan ovan efter de tekniker du faktiskt använder.
+- **Backend / AI-integration:** Express, GitHub API, Open AI
+- **Databas / Parametrar:** Supabase
 
 ## Installation
 
 1. Klona repoet:
 
 ```bash
-git clone https://github.com/ditt-användarnamn/queryme.git
+git clone https://github.com/ArvidAlund/QueryMe.git
 ```
 
 1. Gå in i mappen:
@@ -37,10 +34,13 @@ cd queryme
 npm install
 ```
 
-3. Lägg till dina miljövariabler (t.ex. API-nycklar för AI):
+3. Lägg till dina miljövariabler:
 
 ```bash
-cp .env.example .env
+DATABASE_URL=
+API_KEY=
+GITHUB_TOKEN=
+OPENAI_API_KEY=
 ```
 
 4. Starta projektet:
@@ -52,8 +52,34 @@ npm run dev
 Projektet körs nu på http://localhost:3000.
 
 ## Användning
+Du kan skicka en fråga till API:t med en POST-förfrågan. Följande exempel använder fetch i JavaScript:
 
-Besök sidan och ställ frågor i chattgränssnittet. AI:n kommer att ge svar som reflekterar mina erfarenheter och preferenser.
+```bash
+const res = await fetch("http://localhost:3000/question", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "key": process.env.NEXT_PUBLIC_API_KEY
+    },
+    body: JSON.stringify({
+      data: {
+        question: question
+      }
+    })
+  });
+```
+Svar
+
+Om förfrågan lyckas returneras ett objekt i följande format:
+```json
+{
+    "success": true,
+    "reply": "Svaret på frågan"
+}
+```
+- success: true om förfrågan lyckades.
+
+- reply: svaret från AI:n på den fråga du skickade.
 
 ## Bidra
 
