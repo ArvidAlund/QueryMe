@@ -1,7 +1,7 @@
 import validateKey from "../validateKey.js"
 import getPreGenAnswers from "../../hooks/getData/getPreGenAnswers.js";
 import useCanAnswer from "../../hooks/useCanAnswer.js";
-import getRepos from "../githubApi/getRepos.js";
+import fetchLatestRepoReadme from "../githubApi/fetchLatestRepoReadme.js";
 
 export default async function question(req, res){
     const key = req.headers?.key;
@@ -11,7 +11,7 @@ export default async function question(req, res){
     if (!question || typeof question !== "string") return res.status(400).json( { error:"Input error: Question missing or not a string."} )
     const preGenAnswers = await getPreGenAnswers();
 
-    await getRepos();
+    await fetchLatestRepoReadme();
 
     if (preGenAnswers.success){
 
