@@ -9,7 +9,6 @@ export default async function fetchLatestRepoReadme(){
     const readmeRes = await fetchReadme(repoRes.data[0].name, repoRes.data[0].owner.login);
 
     if (!readmeRes.success) return {success:false}
-
-    console.log(readmeRes.data)
-    return
+    
+    return {success:true, data:readmeRes.data, repoName:repoRes.data[0].name}
 }

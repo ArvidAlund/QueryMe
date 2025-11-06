@@ -2,6 +2,7 @@ import validateKey from "../validateKey.js"
 import getPreGenAnswers from "../../hooks/getData/getPreGenAnswers.js";
 import useCanAnswer from "../../hooks/useCanAnswer.js";
 import fetchLatestRepoReadme from "../githubApi/fetchLatestRepoReadme.js";
+import extractProjectMetaFromReadme from "../githubApi/extractProjectMetaFromReadme.js";
 
 export default async function question(req, res){
     const key = req.headers?.key;
@@ -11,7 +12,12 @@ export default async function question(req, res){
     if (!question || typeof question !== "string") return res.status(400).json( { error:"Input error: Question missing or not a string."} )
     const preGenAnswers = await getPreGenAnswers();
 
-    await fetchLatestRepoReadme();
+    const readme = await fetchLatestRepoReadme();
+
+    if (readme.success){
+        const parsed = extractProjectMetaFromReadme(readme.data, readme.repoName);
+        console.log(parsed.data);
+    }
 
     if (preGenAnswers.success){
 
