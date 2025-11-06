@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import cors from 'cors'
 
 import indexRouter from './src/routes/index.js';
 import usersRouter from './src/routes/users.js';
@@ -20,6 +21,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors({
+  origin: "*"
+}))
 
 // routes
 app.use('/', indexRouter);
