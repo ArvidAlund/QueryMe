@@ -1,5 +1,5 @@
 import validateKey from "../validateKey.js"
-import getPreGenAnswers from "../../hooks/getPreGenAnswers.js";
+import getPreGenAnswers from "../../hooks/getData/getPreGenAnswers.js";
 import useCanAnswer from "../../hooks/useCanAnswer.js";
 
 export default async function question(req, res){
@@ -11,7 +11,7 @@ export default async function question(req, res){
     const preGenAnswers = await getPreGenAnswers();
 
     if (preGenAnswers.success){
-        
+
         const returnData = useCanAnswer(question, preGenAnswers.data);
 
         if (returnData.match) return res.status(200).json( { success:true, reply:returnData.reply } )
