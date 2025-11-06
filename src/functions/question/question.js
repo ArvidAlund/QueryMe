@@ -1,8 +1,7 @@
 import validateKey from "../validateKey.js"
 import getPreGenAnswers from "../../hooks/getData/getPreGenAnswers.js";
 import useCanAnswer from "../../hooks/useCanAnswer.js";
-import fetchLatestRepoReadme from "../githubApi/fetchLatestRepoReadme.js";
-import extractProjectMetaFromReadme from "../githubApi/extractProjectMetaFromReadme.js";
+import sendQuestion from "./sendQuestion.js";
 
 export default async function question(req, res){
     const key = req.headers?.key;
@@ -12,13 +11,6 @@ export default async function question(req, res){
     if (!question || typeof question !== "string") return res.status(400).json( { error:"Input error: Question missing or not a string."} )
     const preGenAnswers = await getPreGenAnswers();
 
-    const readme = await fetchLatestRepoReadme();
-
-    if (readme.success){
-        const parsed = extractProjectMetaFromReadme(readme.data, readme.repoName);
-        console.log(parsed.data);
-    }
-
     if (preGenAnswers.success){
 
         const returnData = useCanAnswer(question, preGenAnswers.data);
@@ -26,5 +18,9 @@ export default async function question(req, res){
         if (returnData.match) return res.status(200).json( { success:true, reply:returnData.reply } )
     }
 
-    return res.status(200)
+    const replyData = await sendQuestion(question)
+
+    if (!replyData.success) return res.status(400).json( {error:"Something went wrong"} )
+
+    return res.status(200).json({success:true, reply:replyData.reply})
 }
