@@ -81,6 +81,12 @@ Om förfrågan lyckas returneras ett objekt i följande format:
 
 - reply: svaret från AI:n på den fråga du skickade.
 
+## Kommande funktioner
+- [ ] Implementera en funktion som hämtar alla GitHub-repon via API och markerar de mest relevanta för visning i showcase-sektionen.  
+- [ ] Implementera en funktion där AI kan analysera och anpassa mitt CV baserat på projekt jag har gjort.  
+- [ ] Implementera en funktion som låter användaren skicka in en jobbannons för att generera ett CV anpassat för just det jobbet.
+
+
 ## Bidra
 
 Om du vill bidra eller ge feedback är du välkommen att skapa en issue eller skicka en pull request.
