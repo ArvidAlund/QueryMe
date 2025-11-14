@@ -15,16 +15,23 @@ let cachedReadme
  *  - { success: false } om `reponame` eller `username` saknas eller något fel uppstår.
  */
 export default async function fetchReadme(reponame, username){
-    if (!cachedReadme){
         console.log("repo: ", reponame, " user: ", username)
         if (!reponame || !username) return {success:false}
-        const readme = await octokit.request("GET /repos/{owner}/{repo}/readme",{
+
+        try {
+        const readme = await octokit.request("GET /repos/{owner}/{repo}/readme", {
             owner: username,
-            repo: reponame
-        })
+            repo: reponame,
+            headers: { "Accept": "application/vnd.github.v3.raw" }
+        });
 
-        cachedReadme = Buffer.from(readme.data.content, "base64").toString("utf-8");
+        if (!readme?.data) {
+            return { success: false, error: "No README content found" };
+        }
+
+        return { success: true, data: readme.data };
+    } catch (err) {
+        console.error("Error fetching README:", err.message);
+        return { success: false, error: err.message };
     }
-
-    return {success:true, data:cachedReadme}
 }
