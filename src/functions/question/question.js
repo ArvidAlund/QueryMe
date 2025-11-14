@@ -6,12 +6,10 @@ import rateLimiter from "../rateLimiter.js";
 import log from "../logging.js";
 
 /**
- * Handle an incoming question request by enforcing rate limits, validating an API key, optionally returning a pre-generated answer, and otherwise forwarding the question to a remote generator.
- *
- * Validates the client IP against a rate limiter and returns 429 when the client exceeded 20 requests per 60 seconds. Validates `req.headers.key` and returns 401 for an invalid or missing key. Validates `req.body.data.question` and returns 400 if missing or not a string. If a matching pre-generated answer is found, responds with 200 and `{ success: true, reply }`; otherwise forwards the question to a remote service and responds with 200 and `{ success: true, reply }` on success or 400 on generation failure.
+ * Handle an incoming question request: enforce per-IP rate limits and API key validation, attempt a matching pre-generated answer, and otherwise forward the question to a remote generator before sending the JSON response.
  *
  * @param {import('http').IncomingMessage & { headers: Record<string,string>, socket: any, body?: any }} req - Express request object; expects `req.headers.key` (API key) and `req.body.data.question` (the question string).
- * @param {import('http').ServerResponse & { status: (code:number)=>any, json: (obj:any)=>any }} res - Express response object used to send JSON HTTP responses with appropriate status codes.
+ * @param {import('http').ServerResponse & { status: (code:number)=>any, json: (obj:any)=>any }} res - Express response object used to send JSON responses with appropriate HTTP status codes.
  */
 export default async function question(req, res){
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
