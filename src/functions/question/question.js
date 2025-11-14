@@ -4,6 +4,8 @@ import useCanAnswer from "../../hooks/useCanAnswer.js";
 import sendQuestion from "./sendQuestion.js";
 import rateLimiter from "../rateLimiter.js";
 import log from "../logging.js";
+import { Result } from "pg";
+import { error } from "console";
 
 /**
  * Handle an incoming question request: enforce per-IP rate limits and API key validation, attempt a matching pre-generated answer, and otherwise forward the question to a remote generator before sending the JSON response.
@@ -13,6 +15,17 @@ import log from "../logging.js";
  */
 export default async function question(req, res){
     const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+
+    if (!ip) {
+        await log({
+            ip,
+            endpoint: "/question",
+            request: req.body,
+            status: "MISSING IDENTIFIER"
+        })
+        return res.status(401).json({ error: "Access denied: Missing identifier"})
+    }
+    
     const limit = await rateLimiter(ip, 20, 60);
 
     if(!limit.allowed){
