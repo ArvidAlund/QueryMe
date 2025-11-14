@@ -4,8 +4,6 @@ import useCanAnswer from "../../hooks/useCanAnswer.js";
 import sendQuestion from "./sendQuestion.js";
 import rateLimiter from "../rateLimiter.js";
 import log from "../logging.js";
-import { Result } from "pg";
-import { error } from "console";
 
 /**
  * Handle an incoming question request: enforce per-IP rate limits and API key validation, attempt a matching pre-generated answer, and otherwise forward the question to a remote generator before sending the JSON response.
@@ -14,23 +12,23 @@ import { error } from "console";
  * @param {import('http').ServerResponse & { status: (code:number)=>any, json: (obj:any)=>any }} res - Express response object used to send JSON responses with appropriate HTTP status codes.
  */
 export default async function question(req, res){
-    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    let identifier = req.headers["x-forwarded-for"];
+    if (identifier) {
+        identifier = identifier.split(",")[0].trim();
+    } else {
+        identifier = req.socket.remoteAddress;
+    }
 
-    if (!ip) {
-        await log({
-            ip,
-            endpoint: "/question",
-            request: req.body,
-            status: "MISSING IDENTIFIER"
-        })
-        return res.status(401).json({ error: "Access denied: Missing identifier"})
+    if (!identifier || identifier.trim() === "") {
+        await log({ identifier, endpoint: "/question", request: req.body, status: "MISSING IDENTIFIER" });
+        return res.status(401).json({ error: "Access denied: Missing identifier" });
     }
     
-    const limit = await rateLimiter(ip, 20, 60);
+    const limit = await rateLimiter(identifier, 20, 60);
 
     if(!limit.allowed){
         await log({
-            ip,
+            identifier,
             endpoint: "/question",
             request: req.body,
             status: "RATE_LIMITED"
@@ -40,7 +38,7 @@ export default async function question(req, res){
     const key = req.headers?.key;
     if (validateKey(key) === false){
         await log({
-            ip,
+            identifier,
             endpoint: "/question",
             request: req.body,
             status: "INVALID_APIKEY"
@@ -52,7 +50,7 @@ export default async function question(req, res){
     const question = req.body?.data.question;
     if (!question || typeof question !== "string"){
         await log({
-            ip,
+            identifier,
             endpoint: "/question",
             request: req.body,
             status: "QUESTION MISSING"
@@ -65,7 +63,7 @@ export default async function question(req, res){
 
         const returnData = useCanAnswer(question, preGenAnswers.data);
         await log({
-            ip,
+            identifier,
             endpoint: "/question",
             request: req.body,
             response: returnData.reply,
@@ -79,7 +77,7 @@ export default async function question(req, res){
 
     if (!replyData.success){
         await log({
-            ip,
+            identifier,
             endpoint: "/question",
             request: req.body,
             status: "INTERNAL ERROR"
@@ -88,7 +86,7 @@ export default async function question(req, res){
     }
 
     await log({
-            ip,
+            identifier,
             endpoint: "/question",
             request: req.body,
             response:replyData.reply,
