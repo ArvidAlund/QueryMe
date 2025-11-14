@@ -2,11 +2,19 @@ import validateKey from "../validateKey.js"
 import getPreGenAnswers from "../../hooks/getData/getPreGenAnswers.js";
 import useCanAnswer from "../../hooks/useCanAnswer.js";
 import sendQuestion from "./sendQuestion.js";
+import rateLimiter from "../rateLimiter.js";
 
 export default async function question(req, res){
+    const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+    const limit = await rateLimiter(ip, 20, 60);
+
+    if(!limit.allowed){
+        return res.status(429).json({ error: "Too many requests. Please wait a bit."})
+    }
     const key = req.headers?.key;
     if (validateKey(key) === false) return res.status(401).json({ error:"Access denied: Invalid or missing API key."})
-
+    
+    
     const question = req.body?.data.question;
     if (!question || typeof question !== "string") return res.status(400).json( { error:"Input error: Question missing or not a string."} )
     const preGenAnswers = await getPreGenAnswers();
