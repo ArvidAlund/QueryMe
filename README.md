@@ -85,6 +85,7 @@ Om förfrågan lyckas returneras ett objekt i följande format:
 - [ ] Implementera en funktion som hämtar alla GitHub-repon via API och markerar de mest relevanta för visning i showcase-sektionen.  
 - [ ] Implementera en funktion där AI kan analysera och anpassa mitt CV baserat på projekt jag har gjort.  
 - [ ] Implementera en funktion som låter användaren skicka in en jobbannons för att generera ett CV anpassat för just det jobbet.
+- [ ] Loggar och loggningar
 
 
 ## Bidra
