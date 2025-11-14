@@ -1,5 +1,12 @@
 import pool from "../db/connector.js";
 
+/**
+ * Enforces a per-identifier rate limit within a sliding time window.
+ * @param {string|number} identifier - Value used to identify the requester.
+ * @param {number} maxRequests - Maximum allowed requests within the time window.
+ * @param {number} windowSec - Time window duration in seconds.
+ * @returns {{allowed: boolean, error?: Error}} An object with `allowed`: `false` when the identifier has reached `maxRequests` within the window, `true` otherwise. If the initial database read fails, the returned object includes an `error` property with the encountered error.
+ */
 export default async function rateLimiter(identifier, maxRequests, windowSec) {
     const now = Date.now();
     const windowStart = now - windowSec * 1000;

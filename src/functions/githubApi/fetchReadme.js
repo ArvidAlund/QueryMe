@@ -1,18 +1,12 @@
 import octokit from "./connector.js"
 let cachedReadme
 
-/*
- * fetchReadme(reponame, username)
- * --------------------------------
- * Hämtar och returnerar README-filen från ett angivet GitHub-repo.
+/**
+ * Fetches the raw README content for a GitHub repository.
  *
- * Parametrar:
- *  - reponame (string): Namnet på repot.
- *  - username (string): Ägaren/användarnamnet till repot.
- *
- * Returnerar:
- *  - { success: true, data: "<README-innehåll>" } om hämtningen lyckades.
- *  - { success: false } om `reponame` eller `username` saknas eller något fel uppstår.
+ * @param {string} reponame - Repository name.
+ * @param {string} username - Repository owner or username.
+ * @returns {{success: true, data: string} | {success: false, error?: string}} The result object: on success contains `data` with the README content; on failure contains `error` with a message when available.
  */
 export default async function fetchReadme(reponame, username){
         console.log("repo: ", reponame, " user: ", username)
